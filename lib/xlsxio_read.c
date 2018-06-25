@@ -5,7 +5,12 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <string.h>
+#if _WIN32
+#include <basetsd.h>
+typedef SSIZE_T ssize_t;
+#else
 #include <unistd.h>
+#endif
 #include <expat.h>
 
 #ifdef USE_MINIZIP
@@ -491,7 +496,7 @@ uLong ZCALLBACK minizip_io_memory_read_file_fn (voidpf opaque, voidpf stream, vo
     len = size;
   else
     len = ((struct minizip_io_memory_data*)opaque)->datalen - ((struct minizip_io_memory_handle*)stream)->pos;
-  memcpy(buf, ((struct minizip_io_memory_data*)opaque)->data + ((struct minizip_io_memory_handle*)stream)->pos, len);
+  memcpy(buf, ((char*)((struct minizip_io_memory_data*)opaque)->data) + ((struct minizip_io_memory_handle*)stream)->pos, len);
   ((struct minizip_io_memory_handle*)stream)->pos += len;
   return len;
 }
